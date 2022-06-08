@@ -1,0 +1,23 @@
+{
+    "explosive":[
+        {
+        "colors": ["red", "orange"]
+        }
+    ],
+    "restorative":[
+        {
+        "colors": ["green","blue", "white"]
+        }
+    ],
+    "poisonous":[
+        {
+        "colors": ["green"]
+        }
+    ],
+    "combustible":[
+        {
+        "colors": ["red", "orange", "brown"]
+        }
+    ]
+
+}

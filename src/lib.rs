@@ -1,3 +1,20 @@
+enum ReagentKind {
+    Plant
+}
+
+enum ReagentProperty {
+    Restorative,
+    Explosive,
+    Poisonous,
+    Combustible
+}
+
+struct Reagent {
+    kind: ReagentKind,
+    name: String,
+    properties: Vec<ReagentProperty>
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
