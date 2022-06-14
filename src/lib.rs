@@ -1,6 +1,12 @@
 use once_cell::sync::Lazy;
 
 #[derive(Debug, PartialEq)]
+enum BuilderError{
+    IncompleteBuilder,
+    UnknownError
+}
+
+#[derive(Debug, PartialEq)]
 enum ReagentKind {
     Plant,
 }
@@ -104,10 +110,10 @@ impl ReagentBuilder {
         self
     }
 
-    pub fn build(self) -> Result<Reagent, String> {
+    pub fn build(self) -> Result<Reagent, BuilderError> {
         //check if any field is None
         if self.incomplete() {
-            return Err("Incomplete Build".to_string());
+            return Err(BuilderError::IncompleteBuilder);
         }
 
         let reagent = Reagent {
@@ -129,14 +135,14 @@ mod tests {
     fn cant_build_from_new_builder() {
         let inc = ReagentBuilder::new();
 
-        assert_eq!(inc.build(), Err("Incomplete Build".to_string()));
+        assert_eq!(inc.build(), Err(BuilderError::IncompleteBuilder));
     }
 
     #[test]
     fn cant_build_without_effects() {
         let inc = ReagentBuilder::new().with_property(ReagentProperty::Explosive);
 
-        assert_eq!(inc.build(), Err("Incomplete Build".to_string()));
+        assert_eq!(inc.build(), Err(BuilderError::IncompleteBuilder));
     }
 
     #[test]
