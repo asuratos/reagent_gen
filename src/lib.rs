@@ -1,9 +1,9 @@
 use once_cell::sync::Lazy;
 
 #[derive(Debug, PartialEq)]
-enum BuilderError{
+enum BuilderError {
     IncompleteBuilder,
-    UnknownError
+    UnknownError,
 }
 
 #[derive(Debug, PartialEq)]
@@ -67,8 +67,13 @@ impl ReagentBuilder {
         }
     }
 
-    fn incomplete(&self) -> bool {
-        self.kind.is_none() || self.effects.is_none()
+    fn is_incomplete(&self) -> Result<(), BuilderError> {
+        //giving myself space to specify which fields are missing in future errors
+        if self.kind.is_none() || self.effects.is_none() {
+            return Err(BuilderError::IncompleteBuilder);
+        }
+
+        Ok(())
     }
 
     pub fn with_kind(mut self, kind: ReagentKind) -> ReagentBuilder {
@@ -79,13 +84,11 @@ impl ReagentBuilder {
     fn add_property(&mut self, prop: ReagentProperty) {
         if self.property.is_none() {
             self.property = Some(vec![prop]);
-        } else {
-            if let Some(v) = self.property.as_mut() {
-                v.push(prop);
-                v.sort();
-                v.dedup();
-            };
-        }
+        } else if let Some(v) = self.property.as_mut() {
+            v.push(prop);
+            v.sort();
+            v.dedup();
+        };
     }
 
     pub fn with_property(mut self, prop: ReagentProperty) -> ReagentBuilder {
@@ -93,15 +96,13 @@ impl ReagentBuilder {
         self
     }
 
-    fn add_effect(&mut self, eff:ReagentEffect) {
+    fn add_effect(&mut self, eff: ReagentEffect) {
         if self.effects.is_none() {
             self.effects = Some(vec![eff]);
-        } else {
-            if let Some(v) = self.effects.as_mut() {
-                v.push(eff);
-                v.sort();
-                v.dedup();
-            }
+        } else if let Some(v) = self.effects.as_mut() {
+            v.push(eff);
+            v.sort();
+            v.dedup();
         }
     }
 
@@ -110,14 +111,22 @@ impl ReagentBuilder {
         self
     }
 
-    pub fn build(self) -> Result<Reagent, BuilderError> {
-        //check if any field is None
-        if self.incomplete() {
-            return Err(BuilderError::IncompleteBuilder);
-        }
+    fn generate_name(&self) -> String {
+        // TODO: name should be generated here
 
+        // Fill in a template using a primary effect + the kind
+        // ex: "frost" (Freezing) + "fern" (Plant) = "Frostfern"
+
+        "test".to_string()
+    }
+
+    pub fn build(self) -> Result<Reagent, BuilderError> {
+        //check if required fields are None
+        self.is_incomplete()?;
+
+        //if the requried fields are in, return the Reagent
         let reagent = Reagent {
-            name: "test".to_string(),
+            name: self.generate_name(),
             kind: self.kind.unwrap(),
             effects: self.effects.unwrap(),
             property: self.property.unwrap_or_else(Vec::new),
@@ -178,10 +187,7 @@ mod tests {
             .with_property(ReagentProperty::Explosive)
             .with_property(ReagentProperty::Explosive);
 
-        assert_eq!(
-            builder.property,
-            Some(vec![ReagentProperty::Explosive])
-        )
+        assert_eq!(builder.property, Some(vec![ReagentProperty::Explosive]))
     }
 
     #[test]
@@ -209,10 +215,7 @@ mod tests {
             .with_effect(ReagentEffect::Healing)
             .with_effect(ReagentEffect::Healing);
 
-        assert_eq!(
-            builder.effects,
-            Some(vec![ReagentEffect::Healing])
-        )
+        assert_eq!(builder.effects, Some(vec![ReagentEffect::Healing]))
     }
 
     #[test]
