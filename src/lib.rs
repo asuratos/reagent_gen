@@ -1,5 +1,7 @@
 use once_cell::sync::Lazy;
 
+mod namegen;
+
 #[derive(Debug, PartialEq)]
 enum BuilderError {
     IncompleteBuilder,
