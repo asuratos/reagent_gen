@@ -1,18 +1,17 @@
+use std::collections::HashMap;
+
 use once_cell::sync::Lazy;
 use rand::seq::SliceRandom;
 
-use std::collections::HashMap;
-
+use crate::ReagentBuilder;
 
 // TODO: this should eventually be read from a raw file, like a JSON or RON
-static NAMES: Lazy<HashMap<&str, Vec<&str>>> = Lazy::new(|| {
-    let mut names = HashMap::from([("plant", vec!["leaf"]), ("Burning", vec!["ember"])]);
-    names
-});
+static NAMES: Lazy<HashMap<&str, Vec<&str>>> =
+    Lazy::new(|| HashMap::from([("plant", vec!["leaf"]), ("Burning", vec!["ember"])]));
 
 pub enum NameGenError {
     UnknownProperty,
-    EmptyNameList
+    EmptyNameList,
 }
 
 pub fn lookup_name_fragment(prop: &str) -> Result<String, NameGenError> {
@@ -25,9 +24,29 @@ pub fn lookup_name_fragment(prop: &str) -> Result<String, NameGenError> {
     let names_list = NAMES.get(&lc_prop.as_str()).unwrap();
     let frag = names_list.choose(&mut rand::thread_rng());
 
-    if frag.is_none() { return Err(NameGenError::EmptyNameList) }
+    if frag.is_none() {
+        return Err(NameGenError::EmptyNameList);
+    }
 
     Ok(frag.unwrap().to_string())
+}
+
+pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
+    // TODO
+
+    // get &str version of kind for lookup
+    // lookup name fragment for kind
+    let kind = "leaf";
+
+    // get &str of one of the properties for lookup
+    // lookup name fragment for property
+    let prop = "ember";
+
+
+    // use template
+    let template = "{{prop}}{{kind}}";
+
+    Ok(template.replace("{{prop}}", prop).replace("{{kind}}", kind))
 }
 
 #[cfg(test)]

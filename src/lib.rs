@@ -3,25 +3,26 @@ use once_cell::sync::Lazy;
 mod namegen;
 
 #[derive(Debug, PartialEq)]
-enum BuilderError {
+pub enum BuilderError {
     IncompleteBuilder,
+    NameGenFailed,
     UnknownError,
 }
 
 #[derive(Debug, PartialEq)]
-enum ReagentKind {
+pub enum ReagentKind {
     Plant,
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
-enum ReagentProperty {
+pub enum ReagentProperty {
     Explosive,
     Volatile,
     Viscous,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-enum ReagentEffect {
+pub enum ReagentEffect {
     Healing,
     Strength,
     Speed,
@@ -46,7 +47,7 @@ static INCOMPATIBLES: Lazy<Vec<[ReagentEffect; 2]>> =
     Lazy::new(|| vec![[ReagentEffect::Healing, ReagentEffect::Toxic]]);
 
 #[derive(Debug, PartialEq)]
-struct Reagent {
+pub struct Reagent {
     kind: ReagentKind,
     name: String,
     effects: Vec<ReagentEffect>,
@@ -54,7 +55,7 @@ struct Reagent {
 }
 
 #[derive(Debug, PartialEq)]
-struct ReagentBuilder {
+pub struct ReagentBuilder {
     kind: Option<ReagentKind>,
     effects: Option<Vec<ReagentEffect>>,
     property: Option<Vec<ReagentProperty>>,
@@ -113,28 +114,31 @@ impl ReagentBuilder {
         self
     }
 
-    fn generate_name(&self) -> String {
+    fn generate_name(&self) -> Result<String, namegen::NameGenError> {
         // TODO: name should be generated here
 
         // Fill in a template using a primary effect + the kind
         // ex: "frost" (Freezing) + "fern" (Plant) = "Frostfern"
 
-        "test".to_string()
+        namegen::new_name(&self)
     }
 
     pub fn build(self) -> Result<Reagent, BuilderError> {
         //check if required fields are None
         self.is_incomplete()?;
 
-        //if the requried fields are in, return the Reagent
-        let reagent = Reagent {
-            name: self.generate_name(),
-            kind: self.kind.unwrap(),
-            effects: self.effects.unwrap(),
-            property: self.property.unwrap_or_else(Vec::new),
-        };
-
-        Ok(reagent)
+        if let Ok(name) = self.generate_name() {
+            //if the requried fields are in, return the Reagent
+            let reagent = Reagent {
+                name,
+                kind: self.kind.unwrap(),
+                effects: self.effects.unwrap(),
+                property: self.property.unwrap_or_else(Vec::new),
+            };
+            return Ok(reagent);
+        } else {
+            return Err(BuilderError::NameGenFailed);
+        }
     }
 }
 
@@ -223,7 +227,10 @@ mod tests {
     #[test]
     fn complete_build() {
         let builder = ReagentBuilder::new()
+            .with_kind(ReagentKind::Plant)
             .with_effect(ReagentEffect::Healing)
             .with_property(ReagentProperty::Explosive);
+        let end = builder.build();
+        assert!(end.is_ok());
     }
 }
