@@ -1,4 +1,5 @@
 use once_cell::sync::Lazy;
+use std::fmt;
 
 mod namegen;
 
@@ -33,7 +34,7 @@ pub enum ReagentEffect {
     Explosive,
     Toxic,
     Freezing,
-    Combusting,
+    Burning,
     Confusion,
     Paralysis,
     Blinding,
@@ -43,13 +44,31 @@ pub enum ReagentEffect {
     Hallucination,
 }
 
+impl fmt::Display for ReagentKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl fmt::Display for ReagentEffect {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl fmt::Display for ReagentProperty {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 static INCOMPATIBLES: Lazy<Vec<[ReagentEffect; 2]>> =
     Lazy::new(|| vec![[ReagentEffect::Healing, ReagentEffect::Toxic]]);
 
 #[derive(Debug, PartialEq)]
 pub struct Reagent {
-    kind: ReagentKind,
     name: String,
+    kind: ReagentKind,
     effects: Vec<ReagentEffect>,
     property: Vec<ReagentProperty>,
 }
@@ -115,12 +134,10 @@ impl ReagentBuilder {
     }
 
     fn generate_name(&self) -> Result<String, namegen::NameGenError> {
-        // TODO: name should be generated here
-
         // Fill in a template using a primary effect + the kind
         // ex: "frost" (Freezing) + "fern" (Plant) = "Frostfern"
 
-        namegen::new_name(&self)
+        namegen::new_name(self)
     }
 
     pub fn build(self) -> Result<Reagent, BuilderError> {
@@ -135,9 +152,9 @@ impl ReagentBuilder {
                 effects: self.effects.unwrap(),
                 property: self.property.unwrap_or_else(Vec::new),
             };
-            return Ok(reagent);
+            Ok(reagent)
         } else {
-            return Err(BuilderError::NameGenFailed);
+            Err(BuilderError::NameGenFailed)
         }
     }
 }

@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 once_cell = "1.12.0"
 rand = "0.8.5"
+
+[[example]]
+name = "simple_generation"
