@@ -1,4 +1,5 @@
 use once_cell::sync::Lazy;
+use std::fmt;
 
 mod namegen;
 
@@ -41,6 +42,24 @@ pub enum ReagentEffect {
     Viscous,
     Volatile,
     Hallucination,
+}
+
+impl fmt::Display for ReagentKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl fmt::Display for ReagentEffect {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl fmt::Display for ReagentProperty {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 static INCOMPATIBLES: Lazy<Vec<[ReagentEffect; 2]>> =

@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use std::fmt;
+
 use once_cell::sync::Lazy;
 use rand::seq::SliceRandom;
 
@@ -11,11 +13,12 @@ static NAMES: Lazy<HashMap<&str, Vec<&str>>> =
 
 pub enum NameGenError {
     UnknownProperty,
+    UninitializedKind,
     EmptyNameList,
 }
 
-pub fn lookup_name_fragment(prop: &str) -> Result<String, NameGenError> {
-    let lc_prop = prop.to_lowercase();
+pub fn lookup_name_fragment<T: ToString>(prop: T) -> Result<String, NameGenError> {
+    let lc_prop = prop.to_string().to_lowercase();
 
     if !NAMES.contains_key(lc_prop.as_str()) {
         return Err(NameGenError::UnknownProperty);
@@ -36,17 +39,24 @@ pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
 
     // get &str version of kind for lookup
     // lookup name fragment for kind
-    let kind = "leaf";
+
+    let kind: String;
+    if let Some(k) = &builder.kind {
+        kind = k.to_string();
+    } else {
+        return Err(NameGenError::UninitializedKind);
+    }
 
     // get &str of one of the properties for lookup
     // lookup name fragment for property
     let prop = "ember";
 
-
     // use template
     let template = "{{prop}}{{kind}}";
 
-    Ok(template.replace("{{prop}}", prop).replace("{{kind}}", kind))
+    Ok(template
+        .replace("{{prop}}", prop)
+        .replace("{{kind}}", &kind))
 }
 
 #[cfg(test)]
