@@ -14,6 +14,7 @@ static NAMES: Lazy<HashMap<&str, Vec<&str>>> =
 pub enum NameGenError {
     UnknownProperty,
     UninitializedKind,
+    UninitializedEffect,
     EmptyNameList,
 }
 
@@ -47,15 +48,20 @@ pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
         return Err(NameGenError::UninitializedKind);
     }
 
-    // get &str of one of the properties for lookup
-    // lookup name fragment for property
-    let prop = "ember";
+    // get &str of one of the effect for lookup
+    // lookup name fragment for effect
+    let eff: String;
+    if let Some(e) = &builder.effects {
+        eff = e[0].to_string();
+    } else {
+        return Err(NameGenError::UninitializedEffect);
+    }
 
     // use template
     let template = "{{prop}}{{kind}}";
 
     Ok(template
-        .replace("{{prop}}", prop)
+        .replace("{{prop}}", &eff)
         .replace("{{kind}}", &kind))
 }
 
