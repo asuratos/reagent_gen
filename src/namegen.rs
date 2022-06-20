@@ -1,20 +1,18 @@
 use std::collections::HashMap;
+use std::fs;
 
 use once_cell::sync::Lazy;
 use rand::seq::SliceRandom;
+use ron;
 
 use crate::ReagentBuilder;
 
 // TODO: this should eventually be read from a raw file, like a JSON or RON
-static NAMES: Lazy<HashMap<&str, Vec<&str>>> = Lazy::new(|| {
-    HashMap::from([
-        ("plant", vec!["root", "leaf", "fern"]),
-        ("burning", vec!["flame", "fire", "glow", "ember"]),
-        ("healing", vec!["life", "vita", "balm"]),
-        ("strength", vec!["power"]),
-        ("speed", vec!["hype", "stim"]),
-        ("toxic", vec!["bane", "tox"]),
-    ])
+static NAMES: Lazy<HashMap<String, Vec<String>>> = Lazy::new(|| {
+    ron::from_str(fs::read_to_string("src/data/names.ron")
+    .expect("Could not open file!")
+    .as_str())
+    .expect("Could not deserialize!")
 });
 
 pub enum NameGenError {
@@ -31,7 +29,7 @@ pub fn lookup_name_fragment<T: ToString>(prop: T) -> Result<String, NameGenError
         return Err(NameGenError::UnknownProperty);
     }
 
-    let names_list = NAMES.get(&lc_prop.as_str()).unwrap();
+    let names_list = NAMES.get(lc_prop.as_str()).unwrap();
     let frag = names_list.choose(&mut rand::thread_rng());
 
     if frag.is_none() {

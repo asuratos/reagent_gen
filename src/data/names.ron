@@ -1,0 +1,9 @@
+{
+"plant": ["root", "leaf", "fern"],
+"burning": ["flame", "fire", "glow", "ember"],
+"healing": ["life", "vita", "balm"],
+"strength": ["power"],
+"speed": ["hype", "stim"],
+"toxic": ["bane", "tox"],
+"clairvoyance": ["seers", "psycho"]
+}
