@@ -9,9 +9,11 @@ use crate::ReagentBuilder;
 
 // TODO: this should eventually be read from a raw file, like a JSON or RON
 static NAMES: Lazy<HashMap<String, Vec<String>>> = Lazy::new(|| {
-    ron::from_str(fs::read_to_string("src/data/names.ron")
-    .expect("Could not open file!")
-    .as_str())
+    ron::from_str(
+        fs::read_to_string("src/data/names.ron")
+            .expect("Could not open file!")
+            .as_str(),
+    )
     .expect("Could not deserialize!")
 });
 
