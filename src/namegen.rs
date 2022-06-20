@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use std::fmt;
+
 use once_cell::sync::Lazy;
 use rand::seq::SliceRandom;
 
@@ -46,15 +48,27 @@ pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
         return Err(NameGenError::UninitializedKind);
     }
 
-    // get &str of one of the properties for lookup
-    // lookup name fragment for property
-    let prop = "ember";
+    let kind: String;
+    if let Some(k) = &builder.kind {
+        kind = k.to_string();
+    } else {
+        return Err(NameGenError::UninitializedKind);
+    }
+
+    // get &str of one of the effect for lookup
+    // lookup name fragment for effect
+    let eff: String;
+    if let Some(e) = &builder.effects {
+        eff = e[0].to_string();
+    } else {
+        return Err(NameGenError::UninitializedEffect);
+    }
 
     // use template
     let template = "{{prop}}{{kind}}";
 
     Ok(template
-        .replace("{{prop}}", prop)
+        .replace("{{prop}}", &eff)
         .replace("{{kind}}", &kind))
 }
 
