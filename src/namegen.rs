@@ -1,15 +1,21 @@
 use std::collections::HashMap;
 
-use std::fmt;
-
 use once_cell::sync::Lazy;
 use rand::seq::SliceRandom;
 
 use crate::ReagentBuilder;
 
 // TODO: this should eventually be read from a raw file, like a JSON or RON
-static NAMES: Lazy<HashMap<&str, Vec<&str>>> =
-    Lazy::new(|| HashMap::from([("plant", vec!["leaf"]), ("burning", vec!["ember"])]));
+static NAMES: Lazy<HashMap<&str, Vec<&str>>> = Lazy::new(|| {
+    HashMap::from([
+        ("plant", vec!["root", "leaf", "fern"]),
+        ("burning", vec!["flame", "fire", "glow", "ember"]),
+        ("healing", vec!["life", "vita", "balm"]),
+        ("strength", vec!["power"]),
+        ("speed", vec!["hype", "stim"]),
+        ("toxic", vec!["bane", "tox"]),
+    ])
+});
 
 pub enum NameGenError {
     UnknownProperty,
@@ -36,21 +42,12 @@ pub fn lookup_name_fragment<T: ToString>(prop: T) -> Result<String, NameGenError
 }
 
 pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
-    // TODO
-
     // get &str version of kind for lookup
     // lookup name fragment for kind
 
     let kind: String;
     if let Some(k) = &builder.kind {
-        kind = k.to_string();
-    } else {
-        return Err(NameGenError::UninitializedKind);
-    }
-
-    let kind: String;
-    if let Some(k) = &builder.kind {
-        kind = k.to_string();
+        kind = lookup_name_fragment(k)?;
     } else {
         return Err(NameGenError::UninitializedKind);
     }
@@ -59,7 +56,8 @@ pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
     // lookup name fragment for effect
     let eff: String;
     if let Some(e) = &builder.effects {
-        eff = e[0].to_string();
+        // TODO: change this to randomly pick one?
+        eff = lookup_name_fragment(&e[0])?;
     } else {
         return Err(NameGenError::UninitializedEffect);
     }
@@ -74,7 +72,11 @@ pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
 
 #[cfg(test)]
 mod tests {
+    use crate::{ReagentEffect, ReagentKind};
+
     use super::*;
+
+    use strum::IntoEnumIterator;
 
     #[test]
     fn unknown_property() {
@@ -85,5 +87,22 @@ mod tests {
     fn name_fragment_args_are_case_insensitive() {
         assert!(lookup_name_fragment("Plant").is_ok());
         assert!(lookup_name_fragment("plant").is_ok());
+    }
+
+    #[test]
+    fn names_dict_is_complete() {
+        //for all values of ReagentEffect and ReagentKind, there must be
+        // a key in NAMES so that the lookup can work
+        for kind in ReagentKind::iter() {
+            if !(NAMES.contains_key(kind.to_string().to_lowercase().as_str())) {
+                panic!("No entry found for {:?}", kind)
+            };
+        }
+
+        for eff in ReagentEffect::iter() {
+            if !(NAMES.contains_key(eff.to_string().to_lowercase().as_str())) {
+                panic!("No entry found for {:?}", eff)
+            }
+        }
     }
 }

@@ -1,5 +1,8 @@
-use once_cell::sync::Lazy;
 use std::fmt;
+
+use once_cell::sync::Lazy;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 mod namegen;
 
@@ -10,38 +13,38 @@ pub enum BuilderError {
     UnknownError,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(EnumIter, Debug, PartialEq)]
 pub enum ReagentKind {
     Plant,
 }
 
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, EnumIter)]
 pub enum ReagentProperty {
     Explosive,
     Volatile,
     Viscous,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
 pub enum ReagentEffect {
     Healing,
     Strength,
     Speed,
     Clairvoyance,
-    StoneSkin,
-    Flight,
-    Invisibility,
-    Explosive,
+    // StoneSkin,
+    // Flight,
+    // Invisibility,
+    // Explosive,
     Toxic,
-    Freezing,
+    // Freezing,
     Burning,
-    Confusion,
-    Paralysis,
-    Blinding,
-    Flashing,
-    Viscous,
-    Volatile,
-    Hallucination,
+    // Confusion,
+    // Paralysis,
+    // Blinding,
+    // Flashing,
+    // Viscous,
+    // Volatile,
+    // Hallucination,
 }
 
 impl fmt::Display for ReagentKind {
