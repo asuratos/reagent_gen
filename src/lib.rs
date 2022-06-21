@@ -1,6 +1,7 @@
 use std::fmt;
 
 use once_cell::sync::Lazy;
+use rand::{seq::IteratorRandom, Rng};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -22,7 +23,7 @@ pub enum ReagentKind {
 pub enum ReagentProperty {
     Explosive,
     Volatile,
-    Viscous,
+    // Viscous,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
@@ -121,6 +122,20 @@ impl ReagentBuilder {
         self
     }
 
+    pub fn with_random_properties(mut self, num: usize) -> ReagentBuilder {
+        let mut rng = rand::thread_rng();
+
+        for _ in 0..num {
+            let roll: f32 = rng.gen();
+            if roll <= 0.50 {
+                return self;
+            }
+            self.add_property(ReagentProperty::iter().choose(&mut rng).unwrap());
+        }
+
+        self
+    }
+
     fn add_effect(&mut self, eff: ReagentEffect) {
         if self.effects.is_none() {
             self.effects = Some(vec![eff]);
@@ -136,10 +151,16 @@ impl ReagentBuilder {
         self
     }
 
+    pub fn with_random_effects(mut self, num: usize) -> ReagentBuilder {
+        for eff in ReagentEffect::iter().choose_multiple(&mut rand::thread_rng(), num) {
+            self.add_effect(eff);
+        }
+        self
+    }
+
     fn generate_name(&self) -> Result<String, namegen::NameGenError> {
         // Fill in a template using a primary effect + the kind
         // ex: "frost" (Freezing) + "fern" (Plant) = "Frostfern"
-
         namegen::new_name(self)
     }
 
@@ -199,11 +220,11 @@ mod tests {
     fn adding_property_appends() {
         let builder = ReagentBuilder::new()
             .with_property(ReagentProperty::Explosive)
-            .with_property(ReagentProperty::Viscous);
+            .with_property(ReagentProperty::Volatile);
 
         assert_eq!(
             builder.property,
-            Some(vec![ReagentProperty::Explosive, ReagentProperty::Viscous])
+            Some(vec![ReagentProperty::Explosive, ReagentProperty::Volatile])
         )
     }
 
