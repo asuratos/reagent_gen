@@ -84,6 +84,12 @@ pub struct ReagentBuilder {
     property: Option<Vec<ReagentProperty>>,
 }
 
+impl Default for ReagentBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ReagentBuilder {
     pub fn new() -> ReagentBuilder {
         ReagentBuilder {
@@ -161,7 +167,7 @@ impl ReagentBuilder {
     fn generate_name(&self) -> Result<String, namegen::NameGenError> {
         // Fill in a template using a primary effect + the kind
         // ex: "frost" (Freezing) + "fern" (Plant) = "Frostfern"
-        namegen::new_name(self)
+        namegen::generate_name(self)
     }
 
     pub fn build(self) -> Result<Reagent, BuilderError> {

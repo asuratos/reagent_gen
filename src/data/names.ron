@@ -1,5 +1,5 @@
 {
-"plant": ["root", "leaf", "fern"],
+"plant": ["root", "leaf", "fern", "wood"],
 "burning": ["flame", "fire", "glow", "ember"],
 "healing": ["life", "vita", "balm"],
 "strength": ["power"],

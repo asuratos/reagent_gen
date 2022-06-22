@@ -3,7 +3,6 @@ use std::fs;
 
 use once_cell::sync::Lazy;
 use rand::seq::SliceRandom;
-use ron;
 
 use crate::ReagentBuilder;
 
@@ -40,10 +39,8 @@ pub fn lookup_name_fragment<T: ToString>(prop: T) -> Result<String, NameGenError
     Ok(frag.unwrap().to_string())
 }
 
-pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
-    // get &str version of kind for lookup
+pub fn generate_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
     // lookup name fragment for kind
-
     let kind: String;
     if let Some(k) = &builder.kind {
         kind = lookup_name_fragment(k)?;
@@ -51,11 +48,9 @@ pub fn new_name(builder: &ReagentBuilder) -> Result<String, NameGenError> {
         return Err(NameGenError::UninitializedKind);
     }
 
-    // get &str of one of the effect for lookup
     // lookup name fragment for effect
     let eff: String;
     if let Some(e) = &builder.effects {
-        // TODO: change this to randomly pick one?
         eff = lookup_name_fragment(&e[0])?;
     } else {
         return Err(NameGenError::UninitializedEffect);
