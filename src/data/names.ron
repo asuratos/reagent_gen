@@ -1,9 +1,18 @@
 {
-"plant": ["root", "leaf", "fern", "wood"],
+"plant": ["root", "leaf", "fern", "wood", "vine", "seed", "grass", "bloom"],
 "burning": ["flame", "fire", "glow", "ember"],
 "healing": ["life", "vita", "balm"],
 "strength": ["power"],
-"speed": ["hype", "stim"],
+"speed": ["hype", "stim", "swift", "rush"],
 "toxic": ["bane", "tox"],
-"clairvoyance": ["seers", "psycho"]
+"clairvoyance": ["seers", "psycho"],
+"stoneskin": ["stone", "rock"],
+"flight": ["feather", "air"],
+"invisibility": ["clear"],
+"freezing": ["frost", "ice", "cool"],
+"confusion": ["haze", "daze"],
+"paralysis": ["stun", "numb"],
+"flashing": ["shimmer", "bright"],
+"blinding": ["dark", "shadow", "blind"],
+"hallucination": ["dream"]
 }
