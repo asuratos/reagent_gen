@@ -36,6 +36,7 @@ pub enum ReagentEffect {
     Flight,
     Invisibility,
     Toxic,
+    Acidic,
     Freezing,
     Burning,
     Confusion,
@@ -57,11 +58,11 @@ impl fmt::Display for ReagentEffect {
     }
 }
 
-impl fmt::Display for ReagentProperty {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
+// impl fmt::Display for ReagentProperty {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(f, "{:?}", self)
+//     }
+// }
 
 static INCOMPATIBLES: Lazy<Vec<[ReagentEffect; 2]>> =
     Lazy::new(|| vec![[ReagentEffect::Healing, ReagentEffect::Toxic]]);
@@ -170,6 +171,8 @@ impl ReagentBuilder {
     pub fn build(self) -> Result<Reagent, BuilderError> {
         //check if required fields are None
         self.is_incomplete()?;
+
+        //TODO: figure out easy build (automatically generate effects or kinds)
 
         if let Ok(name) = self.generate_name() {
             //if the requried fields are in, return the Reagent

@@ -14,5 +14,6 @@
 "paralysis": ["stun", "numb"],
 "flashing": ["shimmer", "bright", "glow", "lumen"],
 "blinding": ["dark", "shadow", "blind"],
-"hallucination": ["dream"]
+"hallucination": ["dream"],
+"acidic": ["acid", ]
 }
