@@ -173,6 +173,7 @@ impl ReagentBuilder {
         self.is_incomplete()?;
 
         //TODO: figure out easy build (automatically generate effects or kinds)
+        //      none of the fields should be required
 
         if let Ok(name) = self.generate_name() {
             //if the requried fields are in, return the Reagent
