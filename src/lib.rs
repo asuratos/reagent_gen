@@ -9,7 +9,7 @@ mod namegen;
 
 #[derive(Debug, PartialEq)]
 pub enum BuilderError {
-    IncompleteBuilder,
+    // IncompleteBuilder,
     NameGenFailed,
     UnknownError,
 }
@@ -75,6 +75,8 @@ pub struct Reagent {
     property: Vec<ReagentProperty>,
 }
 
+// TODO: Build easy presets? Reagent::plant(), etc
+
 #[derive(Debug, PartialEq)]
 pub struct ReagentBuilder {
     kind: Option<ReagentKind>,
@@ -97,17 +99,14 @@ impl ReagentBuilder {
         }
     }
 
-    fn is_incomplete(&self) -> Result<(), BuilderError> {
-        //giving myself space to specify which fields are missing in future errors
-        if self.kind.is_none() || self.effects.is_none() {
-            return Err(BuilderError::IncompleteBuilder);
-        }
-
-        Ok(())
-    }
-
     pub fn with_kind(mut self, kind: ReagentKind) -> ReagentBuilder {
         self.kind = Some(kind);
+        self
+    }
+
+    pub fn with_random_kind(mut self) -> ReagentBuilder {
+        let mut rng = rand::thread_rng();
+        self.kind = Some(ReagentKind::iter().choose(&mut rng).unwrap());
         self
     }
 
@@ -168,9 +167,15 @@ impl ReagentBuilder {
         namegen::generate_name(self)
     }
 
-    pub fn build(self) -> Result<Reagent, BuilderError> {
-        //check if required fields are None
-        self.is_incomplete()?;
+    pub fn build(mut self) -> Result<Reagent, BuilderError> {
+        // generate random kind and effect, if missing
+        if self.kind.is_none() {
+            self = self.with_random_kind();
+        }
+
+        if self.effects.is_none() {
+            self = self.with_random_effects(1);
+        }
 
         //TODO: figure out easy build (automatically generate effects or kinds)
         //      none of the fields should be required
@@ -195,18 +200,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn cant_build_from_new_builder() {
-        let inc = ReagentBuilder::new();
-
-        assert_eq!(inc.build(), Err(BuilderError::IncompleteBuilder));
+    fn can_build_from_new_builder() {
+        assert!(ReagentBuilder::new().build().is_ok());
     }
 
-    #[test]
-    fn cant_build_without_effects() {
-        let inc = ReagentBuilder::new().with_property(ReagentProperty::Explosive);
+    // #[test]
+    // fn cant_build_without_effects() {
+    //     let inc = ReagentBuilder::new().with_property(ReagentProperty::Explosive);
 
-        assert_eq!(inc.build(), Err(BuilderError::IncompleteBuilder));
-    }
+    //     assert_eq!(inc.build(), Err(BuilderError::IncompleteBuilder));
+    // }
 
     #[test]
     fn can_build_without_properties() {
